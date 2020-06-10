@@ -25,8 +25,8 @@ uniform sampler2D texture;
 uniform sampler2D structure_texture;
 
 
-const float cloud_vscale = 0.0005;
-const float cloud_vrange = 0.0008;
+const float cloud_vscale = 0.0007;
+const float cloud_vrange = 0.0007;
 const float nbase = 10.0;
 const float nhuge = 30.0;
 
