@@ -25,10 +25,10 @@ uniform sampler2D texture;
 uniform sampler2D structure_texture;
 
 
-const float cloud_vscale = 0.0007;
+const float cloud_vscale = 0.0013;
 const float cloud_vrange = 0.0007;
-const float nbase = 10.0;
-const float nhuge = 30.0;
+const float nbase = 8.0;
+const float nhuge = 24.0;
 
 float Noise2D(in vec2 coord, in float wavelength);
 vec3 filter_combined (in vec3 color) ;
@@ -72,14 +72,13 @@ vec2 delta_parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
   float sdir;
   float height;
   float prevheight = 0.0;
-
   float weight=0.0;
 
   float nsteps = min(nbase/max(0.001,viewDir.z),nhuge);
   float stepsize = cloud_vrange/nbase;
   
   mover = vec3(texCoords,0.0);
-  
+
   height = cloud_vrange * texture2D(texture, mover.xy).a;
   
   
@@ -93,6 +92,7 @@ vec2 delta_parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
       if ( sdir*(mover.z - height) > 0.0 )
 	{
 	  //necessarily overshot, linear interpolation
+	  
 	  weight = (mover.z-height)/(dview.z + prevheight-height);
 	  break;
 	}

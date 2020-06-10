@@ -21,9 +21,9 @@ uniform sampler2D normal_texture;
 
 
 const float relief_vscale = 0.0014;
-const float cloud_vscale = 0.0007;
+const float cloud_vtop = 0.002;
 const float nbase = 10.0;
-const float nhuge = 30.0;
+const float nhuge = 50.0;
 
 
 float Noise2D(in vec2 coord, in float wavelength);
@@ -122,8 +122,8 @@ void main()
 			
   if ((use_cloud_shadows)&&(use_clouds))    
     {
-      float xOffset = -cloud_vscale * dot(lightDir, T);
-      float yOffset = -cloud_vscale * dot(lightDir, B);
+      float xOffset = -cloud_vtop * dot(lightDir, T);
+      float yOffset = -cloud_vtop * dot(lightDir, B);
       shadowTexel = texture2D(shadowtex, vec2(gl_TexCoord[0].s-xOffset, gl_TexCoord[0].t-yOffset));
     }
   else
