@@ -162,7 +162,7 @@ void main()
   intensity = length(light_specular);
   light_specular = mix(dawn.rgb, light_specular, smoothstep(0.0, 0.4, NdotL));
     
-  float oceanness = smoothstep(0.04, 0.10,length(texel.rgb - vec3 (0.007,0.019, 0.078)));
+  float oceanness = smoothstep(0.04, 0.12,length(texel.rgb - vec3 (0.008,0.020, 0.078)));
   float specular_enhancement = 4.0 * (1.0 - oceanness);
 
   if (use_overlay) {
