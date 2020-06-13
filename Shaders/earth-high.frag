@@ -135,17 +135,19 @@ void main()
   float night_light = (1.0 -texel.a);
   texel.a = 1.0;
 
-  float noise = Noise2D( gl_TexCoord[0].st, 0.000002);
-  noise += Noise2D( gl_TexCoord[0].st, 0.000005);
-  noise += Noise2D( gl_TexCoord[0].st, 0.00001);
-  noise += Noise2D( gl_TexCoord[0].st, 0.00002);
-  noise += Noise2D( gl_TexCoord[0].st, 0.00005);
-  noise += Noise2D( gl_TexCoord[0].st, 0.0001);
-  noise += Noise2D( gl_TexCoord[0].st, 0.0002);
-	
-  noise= noise/7.0;
+  float smallnoise = Noise2D( gl_TexCoord[0].st, 0.000002);
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.000005);
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.00001);
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.00002);
+  smallnoise = smallnoise/4.0;
+  
+  float mediumnoise = Noise2D( gl_TexCoord[0].st, 0.00005);
+  mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0001);
+  mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0002);	
+  mediumnoise= mediumnoise/3.0;
 
-	
+  float noise = 0.5*(smallnoise + mediumnoise);
+  
   vec3 light_specular = vec3 (1.0, 1.0, 1.0);
   NdotL = dot(N, lightDir);
   float NdotLraw = NdotL;
@@ -162,9 +164,11 @@ void main()
   intensity = length(light_specular);
   light_specular = mix(dawn.rgb, light_specular, smoothstep(0.0, 0.4, NdotL));
     
-  float oceanness = smoothstep(0.04, 0.12,length(texel.rgb - vec3 (0.008,0.020, 0.078)));
-  float specular_enhancement = 4.0 * (1.0 - oceanness);
+  float oceanness = smoothstep(0.05, 0.18,length(texel.rgb - vec3 (0.008,0.020, 0.078)));
 
+  float specular_enhancement = 4.0*(1.0-oceanness)*(0.8 + 0.4*smallnoise);
+
+  
   if (use_overlay) {
     texel.rgb = texel.rgb * (0.85 + 0.3 * noise);
     texel.r = smoothstep(0.0, 0.95, texel.r);
