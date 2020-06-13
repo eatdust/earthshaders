@@ -23,7 +23,7 @@ uniform sampler2D normal_texture;
 const float relief_vscale = 0.0014;
 const float cloud_vtop = 0.002;
 const float nbase = 10.0;
-const float nhuge = 50.0;
+const float nhuge = 32.0;
 
 
 float Noise2D(in vec2 coord, in float wavelength);
