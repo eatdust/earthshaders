@@ -164,9 +164,20 @@ void main()
   intensity = length(light_specular);
   light_specular = mix(dawn.rgb, light_specular, smoothstep(0.0, 0.4, NdotL));
     
-  float oceanness = smoothstep(0.05, 0.18,length(texel.rgb - vec3 (0.008,0.020, 0.078)));
 
-  float specular_enhancement = 4.0*(1.0-oceanness)*(0.8 + 0.4*smallnoise);
+  float oceanness = smoothstep(0.05, 0.15,length(texel.rgb - vec3(0.008,0.020, 0.078)));
+  float costness = smoothstep(0.04, 0.08, length(texel.rgb - vec3(0.023,0.094,0.034)));
+  float shallowness = smoothstep(0.01, 0.02, length(texel.rgb - vec3(0.000,0.005,0.044)));
+  
+  float ocean_specular = 4.0*(1.0-oceanness);
+  float shallow_specular = 2.0*(1.0-shallowness);
+  float cost_specular = 2.0*(1.0-costness);
+
+  float scintimix = smoothstep(0.49 , 0.5, mediumnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
+  float scintismall = smoothstep(0.49 , 0.5, smallnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
+  
+  float specular_enhancement = ocean_specular + cost_specular*scintimix
+    + shallow_specular*scintismall;
 
   
   if (use_overlay) {
@@ -185,7 +196,7 @@ void main()
 
   if (NdotL >= 0.0) {
     color += diff_term * NdotL * (1.0-shadowTexel.a);
-    NdotHV = max(dot(N, halfVector),0.0);
+    NdotHV = max(dot(n, halfVector),0.0);
     if (gl_FrontMaterial.shininess > 0.0)
       specular.rgb = (gl_FrontMaterial.specular.rgb * specular_enhancement
 		      * light_specular * (1.0-shadowTexel.a)
