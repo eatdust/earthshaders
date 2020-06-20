@@ -166,8 +166,9 @@ void main()
     
 
   float oceanness = smoothstep(0.05, 0.15,length(texel.rgb - vec3(0.008,0.020, 0.078)));
-  float costness = smoothstep(0.04, 0.08, length(texel.rgb - vec3(0.023,0.094,0.034)));
+  float costness = smoothstep(0.04, 0.09, length(texel.rgb - vec3(0.023,0.094,0.034)));
   float shallowness = smoothstep(0.01, 0.02, length(texel.rgb - vec3(0.000,0.005,0.044)));
+  float flatness = smoothstep(0.99,1.0,dot(n,N));
   
   float ocean_specular = 4.0*(1.0-oceanness);
   float shallow_specular = 2.0*(1.0-shallowness);
@@ -177,8 +178,8 @@ void main()
   float scintismall = smoothstep(0.49 , 0.5, smallnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
   
   float specular_enhancement = ocean_specular + cost_specular*scintimix
-    + shallow_specular*scintismall;
-
+				+ shallow_specular*scintismall;
+  specular_enhancement = flatness*specular_enhancement;
   
   if (use_overlay) {
     texel.rgb = texel.rgb * (0.85 + 0.3 * noise);
