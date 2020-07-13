@@ -171,8 +171,8 @@ void main()
   float flatness = smoothstep(0.99,1.0,dot(n,N));
   
   float ocean_specular = 4.0*(1.0-oceanness);
-  float shallow_specular = 2.0*(1.0-shallowness);
-  float cost_specular = 2.0*(1.0-costness);
+  float shallow_specular = (1.0-shallowness);
+  float cost_specular = (1.0-costness);
 
   float scintimix = smoothstep(0.49 , 0.5, mediumnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
   float scintismall = smoothstep(0.49 , 0.5, smallnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
