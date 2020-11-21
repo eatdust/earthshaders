@@ -135,11 +135,10 @@ void main()
   float night_light = (1.0 -texel.a);
   texel.a = 1.0;
 
-  float smallnoise = Noise2D( gl_TexCoord[0].st, 0.000002);
-  smallnoise += Noise2D( gl_TexCoord[0].st, 0.000005);
-  smallnoise += Noise2D( gl_TexCoord[0].st, 0.00001);
+  float smallnoise = Noise2D( gl_TexCoord[0].st, 0.00001);
   smallnoise += Noise2D( gl_TexCoord[0].st, 0.00002);
-  smallnoise = smallnoise/4.0;
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.00004);
+  smallnoise = smallnoise/3.0;
   
   float mediumnoise = Noise2D( gl_TexCoord[0].st, 0.00005);
   mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0001);
@@ -171,7 +170,7 @@ void main()
   float flatness = smoothstep(0.99,1.0,dot(n,N));
   
   float ocean_specular = 4.0*(1.0-oceanness);
-  float shallow_specular = (1.0-shallowness);
+  float shallow_specular = 1.1*(1.0-shallowness);
   float cost_specular = (1.0-costness);
 
   float scintimix = smoothstep(0.49 , 0.5, mediumnoise) * (1.0 - smoothstep(0.5, 0.51, smallnoise));
@@ -257,6 +256,7 @@ void main()
 	
 
   gl_FragColor = clamp(fragColor, 0.0, 1.0);
-		
+
+  
 
 }
