@@ -27,10 +27,11 @@ uniform sampler2D structure_texture;
 
 const float cloud_vscale = 0.0013;
 const float cloud_vrange = 0.0007;
-const float nbase = 8.0;
+const float nbase = 14.0;
 const float nhuge = 24.0;
 
 float Noise2D(in vec2 coord, in float wavelength);
+
 vec3 filter_combined (in vec3 color) ;
 vec3 moonlight_perception (in vec3 light);
 
@@ -76,11 +77,12 @@ vec2 delta_parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
   float nsteps = min(nbase/max(0.001,viewDir.z),nhuge);
   float stepsize = cloud_vrange/nbase;
+
+  float noise;
   
   mover = vec3(texCoords,0.0);
-
-  height = cloud_vrange * texture2D(texture, mover.xy).a;
   
+  height = cloud_vrange * texture2D(texture, mover.xy).a;
   
   sdir = sign(height);
   dview = sdir * viewDir * stepsize;
@@ -100,16 +102,23 @@ vec2 delta_parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
       mover += dview;
 
       prevheight = height;
-      height = cloud_vrange * texture2D(texture, mover.xy).a;
 
+      //      height = cloud_vrange * texture2D(texture, mover.xy).a;
+      
+      noise = Noise2D(mover.xy,0.0005);
+      noise += 0.8*Noise2D(mover.xy,0.0002);
+      noise += 0.4*Noise2D(mover.xy,0.0001);
+      noise += 0.3*Noise2D(mover.xy,0.00004);
+      noise += 0.2*Noise2D(mover.xy,0.00002);
+      noise = noise/2.7;
+      
+      height = cloud_vrange * (0.3+0.7*noise) * texture2D(texture, mover.xy).a;
       
     }
   
   return mover.st - dview.st*weight - texCoords;
   
 }
-
-
 
 
 
@@ -120,7 +129,7 @@ void main()
   vec4 color = gl_Color;
   vec3 lightDir = normalize(gl_LightSource[0].position.xyz);
   vec3 EmDir = normalize(ecViewDir);
-  vec3 halfVector = normalize(lightDir + EmDir);
+  //vec3 halfVector = normalize(lightDir + EmDir);
   vec3 V;
   vec3 L;
   vec4 texel;
@@ -186,7 +195,7 @@ void main()
       //yOffset = -1.0 * dot(ecViewDir, binormal);				
       //grad_dir = normalize (vec2 (xOffset, yOffset));
       //texel = texture2D(texture, texCoord - 0.0005 * grad_dir * ref_texel.a * 0.7);
-
+      
       V = vec3(dot(tangent,EmDir),dot(binormal,EmDir),dot(n,EmDir));
       dtexCoord = delta_parallax_angle_mapping(V);
       
@@ -235,21 +244,24 @@ void main()
   color.a = 1.0;//diffuse_term.a;
   color = clamp(color, 0.0, 1.0);
  
-  structureTexel = texture2D(structure_texture, 20.0 * gl_TexCoord[0].st);
-
-  float noise = Noise2D( gl_TexCoord[0].st, 0.01);
-  noise += Noise2D( gl_TexCoord[0].st, 0.005);
-  noise += Noise2D( gl_TexCoord[0].st, 0.002);
-	
-
-  vec4 noiseTexel = vec4 (1.0,1.0,1.0, 0.5* noise * texel.a);
-  structureTexel = mix(structureTexel, noiseTexel,noiseTexel.a);
-
-  structureTexel = mix(structureTexel, texel, clamp(1.5 * ref_texel.a * (cloudcover_bias - 1.0), 0.0, 1.0));
-
-
+  
   if (use_overlay) 
     {
+      structureTexel = texture2D(structure_texture, 20.0 * gl_TexCoord[0].st);
+
+      float noise = Noise2D( gl_TexCoord[0].st, 0.01);
+      noise += Noise2D( gl_TexCoord[0].st, 0.005);
+      noise += Noise2D( gl_TexCoord[0].st, 0.002);
+	
+
+      vec4 noiseTexel = vec4 (1.0,1.0,1.0, 0.5* noise * texel.a);
+      structureTexel = mix(structureTexel, noiseTexel,noiseTexel.a);
+
+      structureTexel = mix(structureTexel, texel, clamp(1.5 * ref_texel.a * (cloudcover_bias - 1.0), 0.0, 1.0));
+
+
+      
+
       texel = vec4(structureTexel.rgb, smoothstep(0.0, 0.5,texel.a) * structureTexel.a);
       //texel.a = pow(texel.a,1.0/cloudcover_bias);
 
