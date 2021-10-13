@@ -18,7 +18,7 @@ uniform bool use_overlay;
 uniform sampler2D texture;
 uniform sampler2D shadowtex;
 uniform sampler2D normal_texture;
-
+uniform float osg_SimulationTime;
 
 const float relief_vscale = 0.0014;
 const float cloud_vtop = 0.002;
@@ -135,7 +135,10 @@ void main()
   float night_light = (1.0 -texel.a);
   texel.a = 1.0;
 
-  float smallnoise = Noise2D( gl_TexCoord[0].st, 0.00001);
+  float smallamp= 0.0001;  
+  vec2 smallMovingCoord = vec2(gl_TexCoord[0].s + smallamp*osg_SimulationTime,gl_TexCoord[0].t + smallamp*osg_SimulationTime );
+  
+  /*float smallnoise = Noise2D( gl_TexCoord[0].st, 0.00001);
   smallnoise += Noise2D( gl_TexCoord[0].st, 0.00002);
   smallnoise += Noise2D( gl_TexCoord[0].st, 0.00004);
   smallnoise = smallnoise/3.0;
@@ -144,6 +147,17 @@ void main()
   mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0001);
   mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0002);	
   mediumnoise= mediumnoise/3.0;
+  */
+  float smallnoise = Noise2D( smallMovingCoord.st, 0.00004);
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.00008);
+  smallnoise += Noise2D( gl_TexCoord[0].st, 0.0001);
+  smallnoise = smallnoise/3.0;
+  
+  float mediumnoise = Noise2D( gl_TexCoord[0].st, 0.00005);
+  mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0001);
+  mediumnoise += Noise2D( gl_TexCoord[0].st, 0.0002);	
+  mediumnoise= mediumnoise/3.0;
+  
 
   float noise = 0.5*(smallnoise + mediumnoise);
   
